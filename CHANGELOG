@@ -1,0 +1,4 @@
+== 0.7 "?" ?
+
+* Updated to the latest Merb structure and Jeweler
+* Created Merb::Sequel::VERSION

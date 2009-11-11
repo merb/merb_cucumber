@@ -1,55 +1,50 @@
-require 'rubygems'
-require 'rake/gempackagetask'
+require "rubygems"
+require "rake"
 
-require 'merb-core'
-require 'merb-core/tasks/merb'
+# Assume a typical dev checkout to fetch the current merb-core version
+require File.expand_path('../../merb/merb-core/lib/merb-core/version', __FILE__)
 
-GEM_NAME = "merb_cucumber"
-GEM_VERSION = "0.6"
-AUTHOR = ["Roman Gonzalez", "David Leal", "Jacques Crocker"]
-EMAIL = ["merbjedi@gmail.com"]
-HOMEPAGE = "http://github.com/merbjedi/merb_cucumber"
-SUMMARY = "Cucumber integration for Merb"
+# Load this library's version information
+require File.expand_path('../lib/merb_cucumber/version', __FILE__)
 
-spec = Gem::Specification.new do |s|
-  s.rubyforge_project = 'merb'
-  s.name = GEM_NAME
-  s.version = GEM_VERSION
-  s.platform = Gem::Platform::RUBY
-  s.has_rdoc = true
-  s.extra_rdoc_files = ["README.textile", "LICENSE", 'TODO']
-  s.summary = SUMMARY
-  s.description = s.summary
-  s.authors = AUTHOR
-  s.email = EMAIL
-  s.homepage = HOMEPAGE
-  s.add_dependency('merb-core', '>= 1.1')
-  s.add_dependency('cucumber', '>= 0.4.0')
-  s.require_path = 'lib'
-  s.files = %w(LICENSE README.textile Rakefile TODO Generators) + Dir.glob("{lib,spec}/**/*")
-end
+begin
+  require 'jeweler'
 
-Rake::GemPackageTask.new(spec) do |pkg|
-  pkg.gem_spec = spec
-end
-
-desc "install the plugin as a gem"
-task :install do
-  Merb::RakeHelper.install(GEM_NAME, :version => GEM_VERSION)
-end
-
-desc "Uninstall the gem"
-task :uninstall do
-  Merb::RakeHelper.uninstall(GEM_NAME, :version => GEM_VERSION)
-end
-
-desc "Create a gemspec file"
-task :gemspec do
-  File.open("#{GEM_NAME}.gemspec", "w") do |file|
-    file.puts spec.to_ruby
+  Jeweler::Tasks.new do |gemspec|
+    gemspec.version     = Merb::Cucumber::VERSION
+    gemspec.name        = "merb_cucumber"
+    gemspec.description = "Cucumber integration for Merb"
+    gemspec.summary     = "Cucumber integration for Merb"
+    gemspec.authors     = [ "Roman Gonzalez", "David Leal", "Jacques Crocker" ]
+    gemspec.email       = "merbjedi@gmail.com"
+    gemspec.homepage    = "http://github.com/merb/merb_cucumber"
+    gemspec.files       = %w(CHANGELOG LICENSE Rakefile README.textile TODO Generators) + Dir['{lib,spec}/**/*']
+    # Runtime dependencies
+    gemspec.add_dependency "merb-core", ">= 1.1.0.pre"
+    gemspec.add_dependency "cucumber",  ">= 0.4.0"
+    gemspec.add_dependency "merb-gen",  ">= 1.1.0.pre"
+    # Development dependencies
+    gemspec.add_development_dependency "rspec", ">= 1.2.9"
   end
+
+  Jeweler::GemcutterTasks.new
+
+rescue LoadError
+  puts "Jeweler (or a dependency) not available. Install it with: gem install jeweler"
 end
 
 require 'spec/rake/spectask'
-require 'spec/rake/spectask'
-require 'merb-core/test/tasks/spectasks'
+Spec::Rake::SpecTask.new(:spec) do |spec|
+  spec.spec_opts << '--options' << 'spec/spec.opts' if File.exists?('spec/spec.opts')
+  spec.libs << 'lib' << 'spec'
+  spec.spec_files = FileList['spec/**/*_spec.rb']
+end
+
+Spec::Rake::SpecTask.new(:rcov) do |spec|
+  spec.libs << 'lib' << 'spec'
+  spec.pattern = 'spec/**/*_spec.rb'
+  spec.rcov = true
+end
+
+desc 'Default: run spec examples'
+task :default => 'spec'

@@ -1,5 +1,6 @@
 require File.join(File.dirname(__FILE__), 'base')
 require 'webrat'
+require 'cucumber/webrat/element_locator'
 
 module Merb
   module Test
